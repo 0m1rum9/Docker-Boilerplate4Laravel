@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  composer:
+    container_name: composer
+    build:
+      context: Dockerfiles
+      dockerfile: composer.Dockerfile
+    volumes:
+      - ./src:/var/www/laravel
+  app:
+    container_name: app
+    build: 
+      context: Dockerfiles
+      dockerfile: php.Dockerfile
+    volumes:
+      - ./src:/var/www/laravel
+    depends_on:
+      - db
+    networks:
+      - app_network
+  db:
+    image: mysql
+    container_name: mysql_db
+    ports:
+      - '3306:3306'
+    networks:
+      - app_network
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+  server:
+    image: nginx
+    container_name: nginx
+    depends_on:
+      - app
+    networks:
+      - app_network
+    ports:
+     - '7860:80'
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./src:/var/www/laravel
+  pma:
+    image: phpmyadmin
+    depends_on:
+      - db
+    environment:
+      - PMA_HOST=db
+      - PMA_PASSOWRD=root
+    networks:
+      - app_network
+    ports:
+      - '1500:80'
+networks:
+ app_network:
+volumes:
+ mysql: 
+
