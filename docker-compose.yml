@@ -48,7 +48,7 @@ services:
       - db
     environment:
       - PMA_HOST=db
-      - PMA_PASSOWRD=root
+      - PMA_PASSWORD=root
     networks:
       - app_network
     ports:
